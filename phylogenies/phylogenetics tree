@@ -1,0 +1,31 @@
+Phylogenetics tree analysis based on maximum likelihood using IQTREE
+
+Software requirement
+- PLINK version 2 https://www.cog-genomics.org/plink/2.0/
+- Tool for converting SNPs in VCF format to PHYLIP from https://github.com/edgardomortiz/vcf2phylip
+- IQTREE (https://iqtree.org/)
+
+1. Convert data in PLINK format to VCF file format using PLINK2
+>plink2 --bfile final_qc_getmergedall43sam --export vcf-iid --out vcffinal_qc_getmergedall43sam --allow-extra-chr
+output : vcffinal_qc_getmergedall43sam.vcf
+
+2. Convert data in VCF format to PHYLIP format
+>vcf2phylip.py -i vcffinal_qc_getmergedall43sam.vcf
+output : vcffinal_qc_getmergedall43sam.min4.phy (The data contain the first line in number of tiger and number of snps, second line and next line contain sampleID and genotypes)
+
+3. Run IQTREE
+>iqtree2 -s vcffinal_qc_getmergedall43sam.min4.phy -B 1000 -T Auto --prefix resulttree40sam
+where : -B = number of bootstapping 
+output : 
+Analysis results written to: 
+  IQ-TREE report:                resulttree40samWithoutgroup.iqtree
+  Maximum-likelihood tree:       resulttree40samWithoutgroup.treefile
+  Likelihood distances:          resulttree40samWithoutgroup.mldist
+
+Ultrafast bootstrap approximation results written to:
+  Split support values:          resulttree40samWithoutgroup.splits.nex
+  Consensus tree:                resulttree40samWithoutgroup.contree
+  Screen log file:               resulttree40samWithoutgroup.log
+
+4. Visualization tree using iTOL (https://itol.embl.de/)
+filename.treefile is visualized in iTOL
