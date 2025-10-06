@@ -7,7 +7,7 @@
 
 # 📁 Base directories
 base_dir="path/to"
-samplesheet="${base_dir}/samplesheet.txt"
+samplesheet="${base_dir}/26samples.txt"
 reads_dir="${base_dir}/reads"
 mito_dir="${base_dir}/mito"
 ref_fasta="${mito_dir}/ref/Neofelis_nebulosa_4samples.fasta"
@@ -59,4 +59,4 @@ java -Xmx40g -jar "$picard_jar" MarkDuplicates \
 
 mosdepth "${r1}" -n -t $threads --fast-mode "$dedup_bam"
 
-...
+```
