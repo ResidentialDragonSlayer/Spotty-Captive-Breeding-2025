@@ -22,7 +22,11 @@ The pipeline consists of three main stages:
    - Combining GVCFs with `GATK CombineGVCFs`
    - Genotyping with `GATK GenotypeGVCFs`
    - SNP selection and hard filtering
-   - Extraction of high-quality biallelic SNPs and summary 
+   - Extraction of high-quality biallelic SNPs and summary statistics
+
+4. **Step 4: Annotation**
+   - Sorting and indexing GFF files
+   - Variant annotation with 
 
 ---
 
@@ -286,3 +290,11 @@ tabix "$biallelic_vcf"
 bcftools stats -s - "$biallelic_vcf" > "$stats_file"
 
 ```
+
+🔹 Step 4: Annotation with VEP
+
+```
+
+
+```
+
