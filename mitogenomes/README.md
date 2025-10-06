@@ -6,14 +6,14 @@
 #SBATCH --array=1-26%8
 
 # 📁 Base directories
-base_dir="/mnt/tank/scratch/azhuk/clouded_leopards"
+base_dir="path/to"
 samplesheet="${base_dir}/samplesheet.txt"
 reads_dir="${base_dir}/reads"
 mito_dir="${base_dir}/mito"
 ref_fasta="${mito_dir}/ref/Neofelis_nebulosa_4samples.fasta"
 coverage_dir="${mito_dir}/coverage"
 bam_dir="${coverage_dir}/bam"
-picard_jar="/mnt/tank/scratch/azhuk/picard.jar"
+picard_jar="path/to/picard.jar"
 
 # 🔧 Thread count
 threads=16
