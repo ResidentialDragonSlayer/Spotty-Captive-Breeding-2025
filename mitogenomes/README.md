@@ -2,9 +2,11 @@
 
 The workflow includes:
 
-**Step 1: Mitogenome Assembly Using GetOrganelle, trimmed paired-end reads are assembled against a mitochondrial reference to reconstruct circular contigs.
+**Step 1: 
+        Mitogenome Assembly Using GetOrganelle, trimmed paired-end reads are assembled against a mitochondrial reference to reconstruct circular contigs **
 
-**Step 2: Coverage Analysis Assembled contigs are indexed and aligned with BWA, duplicates are removed with Picard, and coverage is calculated using mosdepth.
+**Step 2: 
+        Coverage Analysis Assembled contigs are indexed and aligned with BWA, duplicates are removed with Picard, and coverage is calculated using mosdepth **
 
 
 
