@@ -142,6 +142,7 @@ java -jar "$picard_jar" CollectAlignmentSummaryMetrics \
     -R "$ref2"
 
 ---
+```` ``` ````
 
 ### 🔹 Step 2: Variant Calling with GATK
 
