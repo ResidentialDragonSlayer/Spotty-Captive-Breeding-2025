@@ -294,7 +294,31 @@ bcftools stats -s - "$biallelic_vcf" > "$stats_file"
 🔹 Step 4: Annotation with VEP
 
 ```
+#!/bin/bash
 
+# 📁 Input files
+gff_file="path/to/reference.gff"
+fasta_file="path/to/reference.fasta"
+vcf_input="path/to/output/vcf/ref1/28samples_ref1_snps_pass_bial.vcf"
+
+# 📁 Output files
+sorted_gff="path/to/output/ref1/genomic_sort.gff.gz"
+vcf_annotated="path/to/output/vcf/ref1/28samples_ref1_snps_pass_bial_vep.vcf"
+
+# 📊 Sort and index GFF
+grep -v "#" "$gff_file" | sort -k1,1 -k4,4n -k5,5n -t$'\t' | bgzip -c > "$sorted_gff"
+tabix -p gff "$sorted_gff"
+
+# 🧬 Run VEP annotation
+vep \
+  -i "$vcf_input" \
+  --gff "$sorted_gff" \
+  --fasta "$fasta_file" \
+  --format vcf \
+  --everything \
+  --vcf \
+  --species Neofelis_nebulosa \
+  -o "$vcf_annotated"
 
 ```
 
