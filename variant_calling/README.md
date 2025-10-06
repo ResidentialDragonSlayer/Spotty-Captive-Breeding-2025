@@ -36,6 +36,11 @@ picard_jar="path/to/picard.jar"
 
 # 📁 Unified output base
 base_output="path/to/output"
+qc_raw_dir="${base_output}/qc/raw"
+qc_trimmed_dir="${base_output}/qc/trimmed"
+fastp_json_dir="${base_output}/fastp/json"
+fastp_html_dir="${base_output}/fastp/html"
+multiqc_dir="${base_output}/qc/multiqc"
 bam_dir="${base_output}/bam"
 md_dir="${base_output}/marked_duplicates"
 metrics_dir="${base_output}/metrics"
@@ -50,13 +55,6 @@ threads=8
 # 🧬 Sample names
 r1=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$samplesheet" | awk '{print $1}')
 r2=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$samplesheet" | awk '{print $2}')
-
-# 📁 QC и Trimming директории
-qc_raw_dir="${base_output}/qc/raw"
-qc_trimmed_dir="${base_output}/qc/trimmed"
-fastp_json_dir="${base_output}/fastp/json"
-fastp_html_dir="${base_output}/fastp/html"
-multiqc_dir="${base_output}/qc/multiqc"
 
 # 📊 FastQC для сырых ридов
 fastqc "${reads_dir}/${r1}_1.fastq.gz" "${reads_dir}/${r1}_2.fastq.gz" -t 2 -o "$qc_raw_dir"
