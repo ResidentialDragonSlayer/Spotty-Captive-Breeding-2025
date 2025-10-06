@@ -41,7 +41,7 @@ Each step is implemented as a separate SLURM batch script for parallel execution
 #SBATCH --array=1-28%12
 
 # 📁 Base directories
-samplesheet="path/to/samplesheet.txt"
+samplesheet="path/to/28samples.txt"
 reads_dir="path/to/reads"
 ref1="path/to/reference1.fasta"
 ref2="path/to/reference2.fasta"
@@ -141,12 +141,10 @@ java -jar "$picard_jar" CollectAlignmentSummaryMetrics \
     -O "${metrics_dir}/${ref2_tag}/${r2}_alignment_metrics.txt" \
     -R "$ref2"
 
-
 ```
 
 
 ### 🔹 Step 2: Variant Calling with GATK
-
 
 ```bash
 #!/bin/bash
@@ -156,7 +154,7 @@ java -jar "$picard_jar" CollectAlignmentSummaryMetrics \
 #SBATCH --array=1-28%12
 
 # 📁 Base directories
-samplesheet="path/to/samplesheet.txt"
+samplesheet="path/to/28samples.txt"
 gatk_path="path/to/gatk"
 ref1="path/to/reference1.fasta"
 ref2="path/to/reference2.fasta"
@@ -200,4 +198,91 @@ r2=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$samplesheet" | awk '{print $2}')
 
 ```
 
+### 🔹 Step 3: Joint Genotyping and SNP Filtering & Stats
 
+```bash
+
+#!/bin/bash
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=60G
+#SBATCH --time=14-0
+#SBATCH --array=1-2%2
+
+# 📁 Base directories
+genome_sheet="path/to/2genomes.txt
+ref_dir="path/to/references"
+gatk_path="path/to/gatk"
+vcf_dir="path/to/output/vcf"
+
+# 📁 Reference-specific subfolders
+ref1_tag="ref1"
+ref2_tag="ref2"
+
+# 🔧 Thread count
+threads=4
+
+# 🧬 Reference names
+ref_name=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$genome_sheet" | awk '{print $1}')
+ref_tag=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$genome_sheet" | awk '{print $2}')
+
+# 📁 Reference and interval files
+ref="${ref_dir}/${ref_name}"
+intervals="${vcf_dir}/${ref_tag}.intervals"
+
+# 📁 Output files
+combined_gvcf="${vcf_dir}/${ref_tag}/28samples_${ref_tag}.g.vcf.gz"
+raw_vcf="${vcf_dir}/${ref_tag}/28samples_${ref_tag}_raw.vcf.gz"
+snps_vcf="${vcf_dir}/${ref_tag}/28samples_${ref_tag}_snps.vcf.gz"
+filtered_vcf="${vcf_dir}/${ref_tag}/28samples_${ref_tag}_snps_HF.vcf.gz"
+biallelic_vcf="${vcf_dir}/${ref_tag}/28samples_${ref_tag}_snps_pass_bial.vcf.gz"
+stats_file="${vcf_dir}/${ref_tag}/28samples_${ref_tag}_snps_pass_bial.stats"
+
+echo "🧬 Processing reference ${SLURM_ARRAY_TASK_ID}: ${ref_name} (${ref_tag})"
+
+# 🧬 CombineGVCFs
+"${gatk_path}/gatk" CombineGVCFs --java-options "-Xmx60g" \
+  -R "$ref" \
+  $(for sample in NN114296 NN114297 NN114393 NN115950 NN190240 NNE_114394 \
+    SAMN32324407 SAMN32324408 SAMN32324409 SAMN32324410 SAMN32324411 SAMN32324412 \
+    SAMN32324413 SAMN32324414 SAMN32324415 SAMN32324416 SAMN32324417 SAMN32324418 \
+    SAMN32324419 SAMN32324420 SAMN32324421 SAMN32324422 SAMN32324423 SAMN32324424 \
+    SAMN32324425 SAMN32324426 SAMN32324430 SRR13774415; do
+      echo "--variant ${vcf_dir}/${ref_tag}/${sample}.g.vcf.gz"
+  done) \
+  -O "$combined_gvcf" \
+  -L "$intervals"
+
+# 🧬 GenotypeGVCFs
+"${gatk_path}/gatk" GenotypeGVCFs --java-options "-Xmx60g" \
+  -R "$ref" \
+  -V "$combined_gvcf" \
+  -O "$raw_vcf" \
+  -L "$intervals"
+
+# 🧬 Select SNPs
+"${gatk_path}/gatk" SelectVariants --java-options "-Xmx60g" \
+  -V "$raw_vcf" \
+  -select-type SNP \
+  -O "$snps_vcf"
+
+# 🧬 Hard Filtering
+"${gatk_path}/gatk" VariantFiltration \
+  -V "$snps_vcf" \
+  -filter "DP < 10.0" --filter-name "DP10" \
+  -filter "QD < 2.0" --filter-name "QD2" \
+  -filter "QUAL < 30.0" --filter-name "QUAL30" \
+  -filter "SOR > 3.0" --filter-name "SOR3" \
+  -filter "FS > 60.0" --filter-name "FS60" \
+  -filter "MQ < 40.0" --filter-name "MQ40" \
+  -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
+  -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
+  -O "$filtered_vcf"
+
+# 🧬 Extract PASS biallelic SNPs
+bcftools view -f PASS -m2 -M2 "$filtered_vcf" -Oz -o "$biallelic_vcf" --threads "$threads"
+tabix "$biallelic_vcf"
+
+# 📊 Summary stats
+bcftools stats -s - "$biallelic_vcf" > "$stats_file"
+
+```
