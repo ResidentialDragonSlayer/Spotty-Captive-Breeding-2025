@@ -18,7 +18,8 @@ The pipeline includes the following steps:
 
 ## ⚙️ SLURM Batch Script
 
-Below is the SLURM job script used to process samples in parallel using an array job. 
+Below is the SLURM job script used to process samples in parallel using an array job.
+
 It performs QC and trimming paired illumina reads, alignment to two reference genomes, marks duplicates, and collects metrics.
 
 ```bash
