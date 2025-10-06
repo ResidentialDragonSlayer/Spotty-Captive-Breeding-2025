@@ -11,7 +11,7 @@ The pipeline consists of three main stages:
 1. **Step 1: Preprocessing**
    - Quality control with `FastQC` and `MultiQC`
    - Read trimming with `fastp`
-   - Alignment to two reference genomes using `BWA-MEM2`
+   - Alignment to two reference genomes using `BWA-MEM2`, ref1: GCA_028018385.1_mNeoNeb1.pri_genomic.fna	and ref2: GCA_030324275.1_SNNU_Nneo_1_genomic.fna
    - Duplicate marking and metrics collection with `Picard` and `samtools`
 
 2. **Step 2: Variant Calling**
