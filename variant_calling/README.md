@@ -141,8 +141,9 @@ java -jar "$picard_jar" CollectAlignmentSummaryMetrics \
     -O "${metrics_dir}/${ref2_tag}/${r2}_alignment_metrics.txt" \
     -R "$ref2"
 
----
-```` ``` ````
+
+```
+
 
 ### 🔹 Step 2: Variant Calling with GATK
 
@@ -196,3 +197,7 @@ r2=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$samplesheet" | awk '{print $2}')
   -ERC GVCF \
   -R "$ref2" \
   -L "$intervals_ref2" \
+
+```
+
+
